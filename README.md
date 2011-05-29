@@ -27,11 +27,11 @@ and then run:
 
 - Install the plugin:
 
-`git clone http://github.com/kamui/redmine_campfire_notifications.git vendor/plugins/redmine_campfire_notifications`
+`git clone http://github.com/kamui/redmine-campfire_notifications.git vendor/plugins/redmine-campfire_notifications`
 
 - copy campfire.yml.example into config/campfire.yml with your campfire settings
 
-`cp vendor/plugins/redmine_campfire_notifications/config/campfire.yml.example config/campfire.yml`
+`cp vendor/plugins/redmine-campfire_notifications/config/campfire.yml.example config/campfire.yml`
 
 To do
 ---------

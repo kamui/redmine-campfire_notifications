@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'tinder'
 
-class NotifierHook < Redmine::Hook::ViewListener
+class CampfireNotificationsHook < Redmine::Hook::ViewListener
   logger = RAILS_DEFAULT_LOGGER
   @@subdomain = nil
   @@token     = nil
@@ -52,7 +52,7 @@ class NotifierHook < Redmine::Hook::ViewListener
 
 private
   def speak(message)
-    NotifierHook.load_options unless @@subdomain && @@token && @@room
+    CampfireNotificationsHook.load_options unless @@subdomain && @@token && @@room
     begin
       campfire = Tinder::Campfire.new @@subdomain, :token => @@token
       room = campfire.find_room_by_name(@@room)

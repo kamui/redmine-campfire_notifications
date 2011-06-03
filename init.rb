@@ -1,10 +1,14 @@
 # encoding: utf-8
 require 'redmine'
-require_dependency 'notifier_hook'
+require_dependency 'campfire_notifications_hook'
 
-Redmine::Plugin.register :redmine-campfire_notifications do
+Redmine::Plugin.register :campfire_notifications do
   name 'Redmine Campfire Notifications plugin'
-  author 'Édouard Brière'
+  author 'Jack Chu'
   description 'A plugin to display issue modifications to a Campfire room'
-  version '0.0.3'
+  url 'https://github.com/kamui/redmine-campfire_notifications'
+  author_url 'http://jackchu.com'
+  version '0.0.4'
+
+  requires_redmine :version_or_higher => '0.8.0'
 end

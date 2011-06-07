@@ -15,39 +15,44 @@ class CampfireNotificationsHook < Redmine::Hook::ViewListener
   end
 
   def controller_issues_new_after_save(context = { })
-    @project = context[:project]
-    @issue = context[:issue]
-    @user = @issue.author
-    speak %Q{#{@user.firstname} created issue "#{@issue.subject}". Comment: "#{truncate_words(@issue.description)}" http://#{Setting.host_name}/issues/#{@issue.id}}
+    project = context[:project]
+    issue = context[:issue]
+    user = issue.author
+    speak %Q{#{user.name} created issue "#{issue.subject}". http://#{Setting.host_name}/issues/#{issue.id}}
+    speak issue_notes(issue)
+    speak %Q{Description: "#{truncate_words(issue.description)}"} unless issue.description.blank?
   end
 
   def controller_issues_edit_after_save(context = { })
-    @project = context[:project]
-    @issue = context[:issue]
-    @journal = context[:journal]
-    @user = @journal.user
-    speak %Q{#{@user.firstname} edited issue "#{@issue.subject}". Comment: "#{truncate_words(@journal.notes)}". http://#{Setting.host_name}/issues/#{@issue.id}}
+    project = context[:project]
+    issue = context[:issue]
+    journal = context[:journal]
+    user = journal.user
+
+    speak %Q{#{user.name} edited issue "#{issue.subject}". http://#{Setting.host_name}/issues/#{issue.id}}
+    speak issue_notes(issue)
+    speak %Q{Notes: #{truncate_words(journal.notes)}} unless journal.notes.blank?
   end
 
   def controller_messages_new_after_save(context = { })
-    @project = context[:project]
-    @message = context[:message]
-    @user = @message.author
-    speak %Q{#{@user.firstname} wrote a new message "#{@message.subject}" on #{@project.name}: "#{truncate_words(@message.content)}". http://#{Setting.host_name}/boards/#{@message.board.id}/topics/#{@message.root.id}#message-#{@message.id}}
+    project = context[:project]
+    message = context[:message]
+    user = message.author
+    speak %Q{#{user.name} wrote a new message "#{message.subject}" on #{project.name}: "#{truncate_words(message.content)}". http://#{Setting.host_name}/boards/#{message.board.id}/topics/#{message.root.id}#message-#{message.id}}
   end
 
   def controller_messages_reply_after_save(context = { })
-    @project = context[:project]
-    @message = context[:message]
-    @user = @message.author
-    speak %Q{#{@user.firstname} replied a message "#{@message.subject}" on #{@project.name}: "#{truncate_words(@message.content)}". http://#{Setting.host_name}/boards/#{@message.board.id}/topics/#{@message.root.id}#message-#{@message.id}}
+    project = context[:project]
+    message = context[:message]
+    user = message.author
+    speak %Q{#{user.name} replied a message "#{message.subject}" on #{project.name}: "#{truncate_words(message.content)}". http://#{Setting.host_name}/boards/#{message.board.id}/topics/#{message.root.id}#message-#{message.id}}
   end
 
   def controller_wiki_edit_after_save(context = { })
-    @project = context[:project]
-    @page = context[:page]
-    @user = @page.content.author
-    speak %Q{#{@user.firstname} edited the wiki "#{@page.pretty_title}" on #{@project.name}. http://#{Setting.host_name}/projects/#{@project.identifier}/wiki/#{@page.title}}
+    project = context[:project]
+    page = context[:page]
+    user = page.content.author
+    speak %Q{#{user.name} edited the wiki "#{page.pretty_title}" on #{project.name}. http://#{Setting.host_name}/projects/#{project.identifier}/wiki/#{page.title}}
   end
 
 private
@@ -62,9 +67,18 @@ private
     end
   end
 
-  def truncate_words(text, length = 20, end_string = '…')
+  def truncate_words(text, length = 40, end_string = '…')
     return if text == nil
     words = text.split()
     words[0..(length-1)].join(' ') + (words.length > length ? end_string : '')
+  end
+
+  def issue_notes(issue)
+    status = %Q{Status: #{issue.status.name}} unless issue.status.nil?
+    version = %Q{Version: #{issue.fixed_version}} unless issue.fixed_version.nil?
+    priority = %Q{Priority: #{issue.priority.name}} unless issue.priority.nil?
+    assignee = %Q{Assignee: #{issue.assigned_to}} unless issue.assigned_to.nil?
+
+    return [status, version, priority, assignee].compact.join(' | ')
   end
 end

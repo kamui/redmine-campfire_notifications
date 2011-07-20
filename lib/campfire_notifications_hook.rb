@@ -12,15 +12,17 @@ class CampfireNotificationsHook < Redmine::Hook::ViewListener
     @@subdomain = options[Rails.env]['subdomain']
     @@token = options[Rails.env]['token']
     @@room = options[Rails.env]['room']
+    @@issues = options[Rails.env]['issues']
   end
 
   def controller_issues_new_after_save(context = { })
     project = context[:project]
     issue = context[:issue]
     user = issue.author
-    speak %Q{#{user.name} created issue "#{issue.subject}". http://#{Setting.host_name}/issues/#{issue.id}}
-    speak issue_notes(issue)
-    speak %Q{Description: "#{truncate_words(issue.description)}"} unless issue.description.blank?
+    status = %Q{Status: #{issue.status.name}} unless issue.status.nil?
+    speak %Q{#{user.name} created issue "#{issue.subject}". #{status} http://#{Setting.host_name}/issues/#{issue.id}}
+    speak issue_notes(issue) if @@issues['notes']
+    speak %Q{"#{truncate_words(issue.description)}"} if !issue.description.blank? && @@issues['more_info']
   end
 
   def controller_issues_edit_after_save(context = { })
@@ -28,10 +30,10 @@ class CampfireNotificationsHook < Redmine::Hook::ViewListener
     issue = context[:issue]
     journal = context[:journal]
     user = journal.user
-
-    speak %Q{#{user.name} edited issue "#{issue.subject}". http://#{Setting.host_name}/issues/#{issue.id}}
-    speak issue_notes(issue)
-    speak %Q{Notes: #{truncate_words(journal.notes)}} unless journal.notes.blank?
+    status = %Q{Status: #{issue.status.name}} unless issue.status.nil?
+    speak %Q{#{user.name} edited issue "#{issue.subject}". #{status} http://#{Setting.host_name}/issues/#{issue.id}}
+    speak issue_notes(issue) if @@issues['notes']
+    speak %Q{#{truncate_words(journal.notes)}} if !journal.notes.blank? && @@issues['more_info']
   end
 
   def controller_messages_new_after_save(context = { })
@@ -74,11 +76,10 @@ private
   end
 
   def issue_notes(issue)
-    status = %Q{Status: #{issue.status.name}} unless issue.status.nil?
     version = %Q{Version: #{issue.fixed_version}} unless issue.fixed_version.nil?
     priority = %Q{Priority: #{issue.priority.name}} unless issue.priority.nil?
     assignee = %Q{Assignee: #{issue.assigned_to}} unless issue.assigned_to.nil?
 
-    return [status, version, priority, assignee].compact.join(' | ')
+    return [version, priority, assignee].compact.join(' | ')
   end
 end

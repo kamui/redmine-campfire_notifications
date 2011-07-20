@@ -8,7 +8,7 @@ Redmine::Plugin.register :campfire_notifications do
   description 'A plugin to display issue modifications to a Campfire room'
   url 'https://github.com/kamui/redmine-campfire_notifications'
   author_url 'http://jackchu.com'
-  version '0.0.5'
+  version '0.0.6'
 
-  requires_redmine :version_or_higher => '0.8.5'
+  requires_redmine :version_or_higher => '0.8.0'
 end

@@ -16,22 +16,22 @@ class CampfireNotificationsHook < Redmine::Hook::ViewListener
   end
 
   def controller_issues_new_after_save(context = { })
-    project = context[:project]
     issue = context[:issue]
+    project = issue.project
     user = issue.author
     status = %Q{Status: #{issue.status.name}} unless issue.status.nil?
-    speak %Q{#{user.name} created issue "#{issue.subject}". #{status} http://#{Setting.host_name}/issues/#{issue.id}}
+    speak %Q{#{user.name} created issue "#{issue.subject}" for #{project.name}. #{status} http://#{Setting.host_name}/issues/#{issue.id}}
     speak issue_notes(issue) if @@issues['notes']
     speak %Q{"#{truncate_words(issue.description)}"} if !issue.description.blank? && @@issues['more_info']
   end
 
   def controller_issues_edit_after_save(context = { })
-    project = context[:project]
     issue = context[:issue]
+    project = issue.project
     journal = context[:journal]
     user = journal.user
     status = %Q{Status: #{issue.status.name}} unless issue.status.nil?
-    speak %Q{#{user.name} edited issue "#{issue.subject}". #{status} http://#{Setting.host_name}/issues/#{issue.id}}
+    speak %Q{#{user.name} edited issue "#{issue.subject}" for #{project.name}. #{status} http://#{Setting.host_name}/issues/#{issue.id}}
     speak issue_notes(issue) if @@issues['notes']
     speak %Q{#{truncate_words(journal.notes)}} if !journal.notes.blank? && @@issues['more_info']
   end

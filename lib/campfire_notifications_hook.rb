@@ -2,7 +2,6 @@
 require 'tinder'
 
 class CampfireNotificationsHook < Redmine::Hook::ViewListener
-  logger = RAILS_DEFAULT_LOGGER
   @@subdomain = nil
   @@token     = nil
   @@room      = nil
@@ -65,7 +64,7 @@ private
       room = campfire.find_room_by_name(@@room)
       room.speak message
     rescue => e
-      logger.error "Error during campfire notification: #{e.message}"
+      Rails.logger.error "Error during campfire notification: #{e.message}"
     end
   end
 

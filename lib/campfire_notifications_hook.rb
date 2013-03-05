@@ -8,10 +8,10 @@ class CampfireNotificationsHook < Redmine::Hook::ViewListener
 
   def self.load_options
     options = YAML.load(ERB.new(IO.read(File.join(Rails.root, 'config', 'campfire.yml'))).result)[Rails.env]
-    @@subdomain = options[Rails.env]['subdomain']
-    @@token = options[Rails.env]['token']
-    @@room = options[Rails.env]['room']
-    @@issues = options[Rails.env]['issues']
+    @@subdomain = options['subdomain']
+    @@token = options['token']
+    @@room = options['room']
+    @@issues = options['issues']
   end
 
   def controller_issues_new_after_save(context = { })
